@@ -1,0 +1,607 @@
+
+from __future__ import annotations
+
+import asyncio
+import mimetypes
+import os
+import re
+import subprocess
+from pathlib import Path
+from typing import Any, Callable, Coroutine
+
+_IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".tiff", ".svg"}
+_IMAGE_MAX_BYTES = 20 * 1024 * 1024  # 20 MB
+
+
+def _image_dimensions(p: Path) -> tuple[int, int] | None:
+    """Try to read image width x height without heavy dependencies."""
+    try:
+        from PIL import Image
+        with Image.open(p) as img:
+            return img.size  # (width, height)
+    except Exception:
+        pass
+    # Lightweight PNG header parse (first 24 bytes contain IHDR w/h)
+    try:
+        if p.suffix.lower() == ".png":
+            data = p.read_bytes()[:32]
+            if data[:8] == b"\x89PNG\r\n\x1a\n" and len(data) >= 24:
+                import struct
+                w, h = struct.unpack(">II", data[16:24])
+                return (w, h)
+    except Exception:
+        pass
+    return None
+
+
+_base_dir: Path = Path.cwd()
+_skill_library: Any = None
+_cloud_catalog: Any = None
+_skill_manager: Any = None
+_workboard_path: Path | None = None
+
+
+def configure(
+    workspace: Path,
+    skill_library: Any = None,
+    cloud_catalog: Any = None,
+    skill_manager: Any = None,
+) -> None:
+    global _base_dir, _skill_library, _cloud_catalog, _skill_manager
+    _base_dir = Path(workspace).expanduser().resolve()
+    if skill_library is not None:
+        _skill_library = skill_library
+    if cloud_catalog is not None:
+        _cloud_catalog = cloud_catalog
+    if skill_manager is not None:
+        _skill_manager = skill_manager
+
+
+def configure_workboard(path: Path | str) -> None:
+    """Set the workboard file path (independent of configure to avoid being overwritten)."""
+    global _workboard_path
+    _workboard_path = Path(path).expanduser().resolve()
+
+
+def _resolve_path(raw: str) -> Path:
+    p = Path(raw)
+    if not p.is_absolute():
+        return _base_dir / p
+    return p
+
+
+
+async def bash_tool(command: str, description: str) -> str:
+    if not command.strip():
+        return "bash_tool ERR: empty command"
+
+    wd = _base_dir
+    try:
+        wd.mkdir(parents=True, exist_ok=True)
+    except Exception:
+        pass
+
+    env = os.environ.copy()
+    # Ensure the project .venv/bin is on PATH so `python3` resolves to
+    # the venv interpreter (with all installed packages).
+    venv_bin = _base_dir.parent / ".venv" / "bin"
+    if venv_bin.is_dir():
+        env["PATH"] = str(venv_bin) + os.pathsep + env.get("PATH", "")
+        env["VIRTUAL_ENV"] = str(venv_bin.parent)
+
+    def _run() -> str:
+        try:
+            proc = subprocess.run(
+                ["bash", "-c", command],
+                cwd=str(wd),
+                capture_output=True,
+                text=True,
+                timeout=120,
+                env=env,
+            )
+        except subprocess.TimeoutExpired:
+            return f"bash_tool TIMEOUT after 120s: {command}"
+        except FileNotFoundError as exc:
+            return f"bash_tool ERR: shell not found: {exc}"
+        except Exception as exc:
+            return f"bash_tool ERR: {exc}"
+
+        stdout = (proc.stdout or "").strip()
+        stderr = (proc.stderr or "").strip()
+        if proc.returncode != 0:
+            return f"bash_tool ERR (exit {proc.returncode}):\n{stderr or stdout}"
+        return stdout or stderr or "OK"
+
+    return await asyncio.to_thread(_run)
+
+
+async def str_replace_tool(
+    description: str,
+    path: str,
+    old_str: str,
+    new_str: str = "",
+) -> str:
+    def _run() -> str:
+        p = _resolve_path(path)
+        if not p.exists():
+            return f"str_replace ERR: file not found: {p}"
+        if not p.is_file():
+            return f"str_replace ERR: not a file: {p}"
+
+        content = p.read_text(encoding="utf-8", errors="replace")
+        count = content.count(old_str)
+
+        if count == 0:
+            return f"str_replace ERR: old_str not found in {p}"
+        if count > 1:
+            return f"str_replace ERR: old_str appears {count} times in {p} (must be unique)"
+
+        new_content = content.replace(old_str, new_str, 1)
+        p.write_text(new_content, encoding="utf-8")
+        return f"str_replace OK: {p}"
+
+    return await asyncio.to_thread(_run)
+
+
+async def file_create_tool(
+    description: str,
+    path: str,
+    file_text: str,
+) -> str:
+    def _run() -> str:
+        p = _resolve_path(path)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(file_text, encoding="utf-8")
+        return p
+
+    p = await asyncio.to_thread(_run)
+    result = f"file_create OK: {p}"
+
+    try:
+        skills_dir = _base_dir / "skills"
+        if _skill_library and p.resolve().is_relative_to(skills_dir.resolve()):
+            skill_dir = p.parent if p.name == "SKILL.md" else p.parent.parent
+            if (skill_dir / "SKILL.md").exists():
+                added = _skill_library.refresh_from_disk()
+                if added:
+                    result += f" (auto-refreshed: {added} new skill(s))"
+    except Exception:
+        pass
+
+    return result
+
+
+async def view_tool(
+    description: str,
+    path: str,
+    view_range: list[int] | None = None,
+) -> str:
+    def _run() -> str:
+        p = _resolve_path(path)
+
+        if not p.exists():
+            return f"view ERR: not found: {p}"
+
+        if p.is_dir():
+            return _view_directory(p, max_depth=2)
+
+        if p.suffix.lower() in _IMAGE_EXTS:
+            size = p.stat().st_size
+            if size > _IMAGE_MAX_BYTES:
+                return f"view ERR: image too large ({size} bytes, max {_IMAGE_MAX_BYTES})"
+            mime = mimetypes.guess_type(str(p))[0] or "image/png"
+            # Return metadata instead of full base64 to avoid blowing up
+            # the conversation context with megabytes of encoded data.
+            dims = _image_dimensions(p)
+            dim_str = f", dimensions={dims[0]}x{dims[1]}" if dims else ""
+            return (
+                f"[Image] path={p}, format={mime}, size={size} bytes{dim_str}\n"
+                "To analyze this image, use `route_skill(\"analyze an image\")` "
+                "to find a suitable skill, or describe what you need from it."
+            )
+
+        try:
+            content = p.read_text(encoding="utf-8", errors="replace")
+        except Exception as exc:
+            return f"view ERR: cannot read {p}: {exc}"
+
+        lines = content.splitlines()
+
+        if view_range is not None and len(view_range) == 2:
+            start, end = view_range
+            start = max(1, start)
+            if end == -1:
+                end = len(lines)
+            end = min(end, len(lines))
+            lines = lines[start - 1 : end]
+            offset = start
+        else:
+            offset = 1
+
+        numbered = [f"{offset + i:>6}\t{line}" for i, line in enumerate(lines)]
+        return "\n".join(numbered)
+
+    return await asyncio.to_thread(_run)
+
+
+def _view_directory(
+    path: Path,
+    max_depth: int = 2,
+    current_depth: int = 0,
+    prefix: str = "",
+) -> str:
+    lines: list[str] = []
+    if current_depth == 0:
+        lines.append(str(path) + "/")
+
+    try:
+        entries = sorted(
+            path.iterdir(),
+            key=lambda x: (not x.is_dir(), x.name.lower()),
+        )
+    except PermissionError:
+        return f"{prefix}[permission denied]"
+
+    entries = [
+        e for e in entries if not e.name.startswith(".") and e.name != "node_modules"
+    ]
+
+    for i, entry in enumerate(entries):
+        is_last = i == len(entries) - 1
+        connector = "└── " if is_last else "├── "
+        suffix = "/" if entry.is_dir() else ""
+        lines.append(f"{prefix}{connector}{entry.name}{suffix}")
+        if entry.is_dir() and current_depth < max_depth:
+            extension = "    " if is_last else "│   "
+            sub = _view_directory(entry, max_depth, current_depth + 1, prefix + extension)
+            if sub:
+                lines.append(sub)
+
+    return "\n".join(lines)
+
+
+async def read_skill_tool(skill_name: str) -> str:
+    from core.config import g_settings
+    from core.skills.provider.delta_skills.skills.store.persistence import to_kebab_case
+
+    skills_dir = g_settings.workspace_path / "skills"
+
+    def _try_read_local(sdir: Path, name: str) -> str | None:
+        for dirname in [name, to_kebab_case(name), name.replace("-", "_")]:
+            skill_md = sdir / dirname / "SKILL.md"
+            if skill_md.exists():
+                skill_dir = skill_md.parent
+                scripts_dir = skill_dir / "scripts"
+                content = skill_md.read_text("utf-8")
+                if scripts_dir.is_dir():
+                    hint = (
+                        f"[Skill Location] {skill_dir}\n"
+                        f"To run scripts: cd {skill_dir} && python3 scripts/<script>.py <args>\n"
+                        f"Do NOT use `from skills.* import ...` — always cd into the skill dir first.\n\n"
+                    )
+                else:
+                    hint = (
+                        f"[Skill Location] {skill_dir}\n"
+                        f"This is a knowledge skill — no scripts/ directory. "
+                        f"Read the SKILL.md below and write inline code via bash_tool following its instructions. "
+                        f"Do NOT attempt `from scripts.* import ...` — the files do not exist.\n\n"
+                    )
+                return hint + content
+        return None
+
+    # 1. Try local
+    result = await asyncio.to_thread(_try_read_local, skills_dir, skill_name)
+    if result is not None:
+        return result
+
+    # 2. Fallback: try downloading from cloud catalog
+    if _cloud_catalog is not None:
+        try:
+            from core.skills.provider.delta_skills.importers.utils import download_with_strategy
+
+            entry = _cloud_catalog.get_by_name(skill_name)
+            if entry and entry.github_url:
+                local_path = await asyncio.to_thread(
+                    download_with_strategy,
+                    entry.github_url,
+                    skills_dir,
+                    entry.name,
+                )
+                if local_path:
+                    # Refresh library so the skill is indexed
+                    if _skill_library:
+                        try:
+                            _skill_library.refresh_from_disk()
+                        except Exception:
+                            pass
+                    # Re-try local read after download
+                    result = await asyncio.to_thread(
+                        _try_read_local, skills_dir, skill_name,
+                    )
+                    if result is not None:
+                        return result
+        except Exception:
+            pass
+
+    return f"ERR: skill '{skill_name}' not found. Available skills are in the [Matched Skills] section."
+
+
+
+async def read_workboard_tool(tag: str = "") -> str:
+    """Read the shared workboard, optionally filtering by tag."""
+    if _workboard_path is None or not _workboard_path.exists():
+        return "(no workboard exists)"
+    content = await asyncio.to_thread(_workboard_path.read_text, "utf-8")
+    if not tag:
+        return content
+    pattern = re.compile(
+        rf"<{re.escape(tag)}>(.*?)</{re.escape(tag)}>", re.DOTALL
+    )
+    match = pattern.search(content)
+    if match:
+        return match.group(1).strip()
+    return f"(tag '{tag}' not found in workboard)"
+
+
+async def edit_workboard_tool(tag: str, content: str) -> str:
+    """Replace the content inside <tag>...</tag> on the shared workboard."""
+    if _workboard_path is None:
+        return "edit_workboard ERR: workboard not configured"
+    if not _workboard_path.exists():
+        return "edit_workboard ERR: workboard file does not exist"
+
+    # Validate: reject content that looks like the full workboard template
+    other_tag_pattern = re.compile(r"<t\d+_(result|status)>")
+    other_tag_count = len(other_tag_pattern.findall(content))
+    if other_tag_count >= 2:
+        return (
+            f"edit_workboard ERR: Your content contains {other_tag_count} worker tags "
+            f"(e.g. <tN_result>). You are writing the ENTIRE workboard template "
+            f"into your tag. Only write YOUR data rows — not the full board. "
+            f"Re-read the workboard and try again with just your results."
+        )
+
+    def _run() -> str:
+        board = _workboard_path.read_text(encoding="utf-8")  # type: ignore[union-attr]
+        pattern = re.compile(
+            rf"(<{re.escape(tag)}>)(.*?)(</{re.escape(tag)}>)", re.DOTALL
+        )
+        new_board, n = pattern.subn(rf"\g<1>\n{content}\n\g<3>", board, count=1)
+        if n == 0:
+            return f"edit_workboard ERR: tag '{tag}' not found in workboard"
+        _workboard_path.write_text(new_board, encoding="utf-8")  # type: ignore[union-attr]
+        return f"edit_workboard OK: tag '{tag}' updated"
+
+    return await asyncio.to_thread(_run)
+
+
+async def route_skill_tool(query: str) -> str:
+    """Find the most relevant skills for a sub-task via semantic retrieval."""
+    if not query.strip():
+        return "route_skill ERR: empty query"
+    if _skill_manager is None:
+        return "route_skill ERR: skill_manager not configured"
+    try:
+        context = _skill_manager.get_matched_skills_context(query)
+        if context:
+            return context
+        return "No matching skills found for this query. Consider using `skill-creator` to build one."
+    except Exception as exc:
+        return f"route_skill ERR: {type(exc).__name__}: {exc}"
+
+
+BUILTIN_TOOL_SCHEMAS: list[dict[str, Any]] = [
+    {
+        "type": "function",
+        "function": {
+            "name": "bash_tool",
+            "description": "Run a bash command in the workspace.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "command": {
+                        "type": "string",
+                        "description": "Bash command to run",
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Why I'm running this command",
+                    },
+                },
+                "required": ["command", "description"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "str_replace",
+            "description": (
+                "Replace a unique string in a file with another string. "
+                "The string to replace must appear exactly once in the file."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "description": {
+                        "type": "string",
+                        "description": "Why I'm making this edit",
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "Path to the file to edit",
+                    },
+                    "old_str": {
+                        "type": "string",
+                        "description": "String to replace (must be unique in file)",
+                    },
+                    "new_str": {
+                        "type": "string",
+                        "description": "String to replace with (empty to delete)",
+                        "default": "",
+                    },
+                },
+                "required": ["description", "path", "old_str"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "file_create",
+            "description": "Create a new file with content. Parent directories are created automatically.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "description": {
+                        "type": "string",
+                        "description": "Why I'm creating this file. ALWAYS PROVIDE THIS PARAMETER FIRST.",
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "Path to the file to create. ALWAYS PROVIDE THIS PARAMETER SECOND.",
+                    },
+                    "file_text": {
+                        "type": "string",
+                        "description": "Content to write to the file. ALWAYS PROVIDE THIS PARAMETER LAST.",
+                    },
+                },
+                "required": ["description", "path", "file_text"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "view",
+            "description": (
+                "View text files (with line numbers), directories (tree listing), or images (metadata summary). "
+                "Supports optional line range for text files."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "description": {
+                        "type": "string",
+                        "description": "Why I need to view this",
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "Absolute path to file or directory",
+                    },
+                    "view_range": {
+                        "type": "array",
+                        "items": {"type": "integer"},
+                        "description": (
+                            "Optional line range [start_line, end_line]. "
+                            "Lines are 1-indexed. Use [start, -1] for start to end of file."
+                        ),
+                    },
+                },
+                "required": ["description", "path"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "read_skill",
+            "description": "Read a skill's SKILL.md documentation. Use this to understand how a skill works before executing it via bash_tool.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "skill_name": {
+                        "type": "string",
+                        "description": "Name of the skill to read (e.g. 'web-search', 'skill-creator')",
+                    },
+                },
+                "required": ["skill_name"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "route_skill",
+            "description": (
+                "Find the most relevant skills for a sub-task. "
+                "Use this when you encounter a new sub-problem and need to discover "
+                "which skills (local or cloud) can help. Returns a ranked list of "
+                "matching skills — then call `read_skill` on the one you want to use."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "Describe the sub-task you need a skill for (e.g. 'parse a PDF and extract tables')",
+                    },
+                },
+                "required": ["query"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "read_workboard",
+            "description": "Read the shared workboard. Optionally pass a tag name to read only that section.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "tag": {
+                        "type": "string",
+                        "description": "Optional tag name to filter (e.g. 't1_result'). Leave empty to read entire board.",
+                        "default": "",
+                    },
+                },
+                "required": [],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "edit_workboard",
+            "description": "Replace the content inside a <tag>...</tag> section on the shared workboard.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "tag": {
+                        "type": "string",
+                        "description": "Tag name whose content to replace (e.g. 't1_result')",
+                    },
+                    "content": {
+                        "type": "string",
+                        "description": "New content to place inside the tag",
+                    },
+                },
+                "required": ["tag", "content"],
+            },
+        },
+    },
+]
+
+
+
+BUILTIN_TOOL_REGISTRY: dict[str, Callable[..., Coroutine[Any, Any, str]]] = {
+    "bash_tool": bash_tool,
+    "str_replace": str_replace_tool,
+    "file_create": file_create_tool,
+    "view": view_tool,
+    "read_skill": read_skill_tool,
+    "route_skill": route_skill_tool,
+    "read_workboard": read_workboard_tool,
+    "edit_workboard": edit_workboard_tool,
+}
+
+
+def is_builtin_tool(name: str) -> bool:
+    return name in BUILTIN_TOOL_REGISTRY
+
+
+async def execute_builtin_tool(name: str, arguments: dict[str, Any]) -> str:
+    fn = BUILTIN_TOOL_REGISTRY.get(name)
+    if fn is None:
+        return f"ERR: unknown builtin tool '{name}'"
+    return await fn(**arguments)

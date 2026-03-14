@@ -1,0 +1,65 @@
+Enter your task: 
+=== Final Result ===
+Based on my research, here's a comprehensive overview of both technologies:
+
+## **A2A (Agent-to-Agent) - Google**
+
+### What It Is
+The Agent2Agent (A2A) protocol is an **open communication standard** initially developed by Google and announced in April 2025. Google subsequently donated it to the Linux Foundation to make it an industry-wide open standard.
+
+### Key Features & Capabilities
+- **Agent Interoperability**: Enables AI agents built on different frameworks by different companies to communicate and collaborate seamlessly
+- **Secure Communication**: Allows agents to securely exchange information and coordinate actions across enterprise systems
+- **Cross-Platform**: Works across various systems and platforms, enabling multi-vendor agent development
+- **Open Standard**: Now managed by the Linux Foundation, making it accessible to the entire AI industry
+
+### Purpose & Use Cases
+- Addresses the critical challenge of enabling generative AI agents to work together despite being built on diverse frameworks
+- Enables complex multi-agent systems where different specialized agents collaborate
+- Facilitates enterprise AI deployments where agents need to coordinate across different tools and platforms
+- Supports building, deploying, and selling collaborative agent systems
+
+### Current Status
+- Announced in April 2025
+- Contributed to the Linux Foundation in June 2025
+- Actively being developed and upgraded by Google Cloud
+- Available through Google's Agent Development Kit (ADK)
+- Growing adoption as an industry standard
+
+---
+
+## **Agent Skills - Claude (Anthropic)**
+
+### What It Is
+Agent Skills is a **framework for teaching Claude specific capabilities** through packaged instructions. It's a declarative, prompt-based system that allows Claude to dynamically discover, learn, and execute specialized tasks.
+
+### Key Features & Capabilities
+- **Skill Packages**: Skills are simple folders containing instructions that teach Claude how to handle specific tasks or workflows
+- **Pre-built Skills**: Anthropic provides ready-made skills for common document tasks (PowerPoint, Excel, Word, PDF)
+- **Custom Skills**: Developers can create their own custom skills tailored to their specific needs
+- **Dynamic Discovery**: Claude can discover and invoke skills on-demand using advanced tool use capabilities
+- **Semantic Routing**: Claude automatically selects the best skill for each task
+
+### Purpose & Use Cases
+- Enable reliable coding, research, and data analysis workflows
+- Provide agents with expert on-demand knowledge
+- Allow users to teach Claude how they work, including their templates and processes
+- Handle specialized document processing and manipulation tasks
+- Execute tools dynamically to enable agents that take action in the real world
+
+### Current Status
+- Actively available on the Claude platform
+- Documented in official Claude documentation
+- Public repository available on GitHub (anthropics/skills)
+- Educational course available through DeepLearning.AI
+- Considered one of the most powerful features for customizing Claude's capabilities
+- Part of Anthropic's broader Agent Skills standard (agentskills.io)
+
+---
+
+## **Key Differences**
+
+- **Scope**: A2A focuses on **agent-to-agent communication** (interoperability), while Agent Skills focuses on **enhancing individual agent capabilities** (skill acquisition)
+- **Level**: A2A operates at the **protocol/infrastructure level**, while Agent Skills operates at the **agent capability level**
+- **Governance**: A2A is an **open industry standard** (Linux Foundation), while Agent Skills is **Anthropic's framework** (though with open components)
+- **Complementary**: These technologies could work together - Agent Skills could enhance what individual agents can do, while A2A enables those skilled agents to communicate with each other

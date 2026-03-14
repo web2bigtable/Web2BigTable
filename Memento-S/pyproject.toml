@@ -1,0 +1,67 @@
+[project]
+name = "memento-s"
+version = "0.1.0"
+description = "Memento-S Agent TUI"
+requires-python = ">=3.12"
+dependencies = [
+    "textual",
+    "typer",
+    "rich",
+    "pydantic",
+    "pydantic-settings",
+    "python-dotenv",
+    "watchdog",
+    "anthropic",
+    "openai",
+    "litellm>=1.81.10",
+    "mcp",
+    "tiktoken",
+    "httpx",
+    "aiohttp",
+    "requests",
+    "aiofiles",
+    "anyio",
+    "pyyaml",
+    "google_search_results",
+    "crawl4ai",
+    "nltk",
+    "sentence-transformers",
+    "chromadb",
+    "jieba>=0.42.1",
+    "rank-bm25",
+    "prompt_toolkit",
+]
+
+[project.scripts]
+memento = "cli.main:memento_entry"
+
+[tool.uv]
+required-environments = [
+    "sys_platform == 'darwin' and platform_machine == 'x86_64'",
+    "sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "sys_platform == 'linux'",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["tui", "skills", "agent"]
+include = [
+    "run.py",
+    "skill_utils.py",
+    "tui.py"
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "tui/",
+    "skills/",
+    "agent/",
+    "run.py",
+    "skill_utils.py",
+    "tui.py",
+    "pyproject.toml",
+    "README.md",
+]
