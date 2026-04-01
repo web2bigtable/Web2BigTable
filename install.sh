@@ -173,9 +173,18 @@ setup_repository() {
     elif [ -d "$INSTALL_DIR/.git" ]; then
         log_info "Repository exists, updating..."
         cd "$INSTALL_DIR"
+        # Update remote URL if it changed
+        local current_remote
+        current_remote="$(git remote get-url origin 2>/dev/null || true)"
+        if [ -n "$current_remote" ] && [ "$current_remote" != "$REPO_URL" ]; then
+            log_info "Updating remote URL: $current_remote -> $REPO_URL"
+            git remote set-url origin "$REPO_URL"
+        fi
+        git stash -q 2>/dev/null || true
         git fetch origin "$REPO_BRANCH"
         git checkout "$REPO_BRANCH" 2>/dev/null || git checkout -b "$REPO_BRANCH" "origin/$REPO_BRANCH"
         git pull --rebase || log_warn "Git pull failed, continuing with existing code"
+        git stash pop -q 2>/dev/null || true
         log_success "Repository updated at $INSTALL_DIR (branch: $REPO_BRANCH)"
     else
         log_info "Cloning repository to $INSTALL_DIR..."
