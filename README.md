@@ -43,23 +43,15 @@ We evaluate Memento-Teams on two challenging benchmarks:
 - [**WideSearch**](https://widesearch.github.io/) — a benchmark for complex, multi-step information retrieval tasks requiring parallel search, data extraction, and structured output across diverse domains.
 - [**XBench-DeepSearch**](https://arxiv.org/abs/2505.03829) — a benchmark for evaluating deep research capabilities on real-world questions requiring multi-hop reasoning and comprehensive web search.
 
-<table>
-<tr><td>
 <p align="center">
-  <img src="figures/widesearch_en.png" width="100%" alt="WideSearch-EN bubble chart">
+  <img src="figures/widesearch_en.png" width="70%" alt="WideSearch-EN bubble chart">
 </p>
 <p align="center"><sub>Performance landscape on WideSearch-EN (Avg@4). Scatter points show multi-agent systems: position encodes Row F1 (x-axis) and Item F1 (y-axis); label encodes Success Rate. Dashed lines indicate Item F1 of frontier single-agent models. Memento-Teams dominates all three metrics simultaneously.</sub></p>
-</td></tr>
-</table>
 
-<table>
-<tr><td>
 <p align="center">
-  <img src="figures/xbench_deepsearch.png" width="100%" alt="XBench-DeepSearch bar chart">
+  <img src="figures/xbench_deepsearch.png" width="70%" alt="XBench-DeepSearch bar chart">
 </p>
 <p align="center"><sub>Accuracy on XBench-DeepSearch. Memento-Teams achieves 68.0%, surpassing all open-source agentic models and rivalling frontier proprietary systems.</sub></p>
-</td></tr>
-</table>
 
 ---
 
