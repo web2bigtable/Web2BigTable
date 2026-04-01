@@ -129,6 +129,10 @@ This is the key difference from systems that simply fan out subtasks to workers.
 curl -sSL https://raw.githubusercontent.com/Memento-Teams/Memento-Teams/main/install.sh | bash
 ```
 
+<p align="center">
+  <img src="figures/terminal-demo.gif" width="80%" alt="Memento-Teams install and launch demo">
+</p>
+
 The installer will:
 - Install `uv` (if not present)
 - Clone the repository
