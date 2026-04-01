@@ -1,4 +1,4 @@
-<h1 align="center"><img src="figures/logo.svg" width="42" style="vertical-align: middle;" alt="logo">&nbsp;Memento-Team: A Bilevel Game Framework for Self-Evolving Multi-Agent Systems</h1>
+<h1 align="center">Memento-Team: A Bilevel Game Framework for Self-Evolving Multi-Agent Systems</h1>
 
 <p align="center">Decompose complex tasks. Dispatch parallel workers. Evolve better strategies from every run.</p>
 
