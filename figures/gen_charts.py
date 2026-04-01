@@ -32,7 +32,7 @@ BLUE    = "#005a9c"   # Ours
 # ══════════════════════════════════════════════════════════════
 # 1. WideSearch-EN scatter chart
 # ══════════════════════════════════════════════════════════════
-fig, ax = plt.subplots(figsize=(8, 7))
+fig, ax = plt.subplots(figsize=(12, 10))
 
 # Data: (name, row_f1, item_f1, sr, marker, color)
 baselines = [
@@ -53,20 +53,20 @@ label_pos = {
 
 # Plot baselines
 for name, rf1, if1, sr, marker, color in baselines:
-    ax.scatter(rf1, if1, s=120, c=color, alpha=0.45,
-               edgecolors=color, linewidths=1.2, zorder=5,
+    ax.scatter(rf1, if1, s=200, c=color, alpha=0.45,
+               edgecolors=color, linewidths=1.5, zorder=5,
                marker=marker)
     dx, dy, ha = label_pos[name]
     ax.annotate(f"{name} (SR {sr})", (rf1, if1),
                 textcoords="offset points", xytext=(dx, dy),
-                ha=ha, va="center", fontsize=8.5, color=color)
+                ha=ha, va="center", fontsize=12, color=color)
 
 # Plot ours — large circle with SR inside
-ax.scatter(ours[1], ours[2], s=1800, c=BLUE, alpha=0.2,
-           edgecolors=BLUE, linewidths=1.8, zorder=4)
+ax.scatter(ours[1], ours[2], s=2800, c=BLUE, alpha=0.2,
+           edgecolors=BLUE, linewidths=2, zorder=4)
 ax.annotate(f"{ours[0]} (SR {ours[3]})", (ours[1], ours[2]),
-            textcoords="offset points", xytext=(0, 32),
-            ha="center", fontsize=10, fontweight="bold", color=BLUE)
+            textcoords="offset points", xytext=(0, 38),
+            ha="center", fontsize=14, fontweight="bold", color=BLUE)
 
 # Single-agent reference lines (dashed)
 ref_lines = [
@@ -80,21 +80,21 @@ label_x = [58, 44, 58, 44]
 anchor_y = ["south", "north", "south", "south"]
 
 for (name, val, color), lx, ay in zip(ref_lines, label_x, anchor_y):
-    ax.axhline(y=val, color=color, alpha=0.35, linewidth=0.8, linestyle="--", zorder=2)
+    ax.axhline(y=val, color=color, alpha=0.35, linewidth=1, linestyle="--", zorder=2)
     y_off = 0.4 if ay == "south" else -0.4
     va = "bottom" if ay == "south" else "top"
-    ax.text(lx, val + y_off, f"{name}: {val}", fontsize=7, color=color, alpha=0.7, va=va)
+    ax.text(lx, val + y_off, f"{name}: {val}", fontsize=10, color=color, alpha=0.7, va=va)
 
-ax.set_xlabel("Row F1 (Avg@4)", fontsize=11, labelpad=8)
-ax.set_ylabel("Item F1 (Avg@4)", fontsize=11, labelpad=8)
+ax.set_xlabel("Row F1 (Avg@4)", fontsize=14, labelpad=10)
+ax.set_ylabel("Item F1 (Avg@4)", fontsize=14, labelpad=10)
 ax.set_xlim(26, 74)
 ax.set_ylim(46, 90)
 ax.set_xticks([30, 40, 50, 60, 70])
 ax.set_yticks([50, 55, 60, 65, 70, 75, 80, 85])
-ax.set_title("WideSearch-EN", fontsize=14, fontweight="bold", pad=14)
+ax.set_title("WideSearch-EN", fontsize=18, fontweight="bold", pad=16)
 
 fig.tight_layout()
-fig.savefig("figures/widesearch_en.png", dpi=200, bbox_inches="tight")
+fig.savefig("figures/widesearch_en.png", dpi=300, bbox_inches="tight")
 plt.close(fig)
 print("figures/widesearch_en.png")
 
@@ -102,7 +102,7 @@ print("figures/widesearch_en.png")
 # ══════════════════════════════════════════════════════════════
 # 2. XBench-DeepSearch horizontal bar chart
 # ══════════════════════════════════════════════════════════════
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plt.subplots(figsize=(12, 9))
 
 models = [
     "GLM-4.5", "Kimi-Res.", "Memento-Team (Ours)",
@@ -126,22 +126,22 @@ for i, (model, score) in enumerate(zip(models, scores)):
     txt_color = BLUE if is_ours else "#6b7280"
     weight = "bold" if is_ours else "normal"
     ax.text(score + 0.5, i, f"{score:.1f}", va="center", ha="left",
-            fontsize=8.5, color=txt_color, fontweight=weight)
+            fontsize=12, color=txt_color, fontweight=weight)
 
 ax.set_yticks(range(len(models)))
-ax.set_yticklabels(models, fontsize=9)
+ax.set_yticklabels(models, fontsize=12)
 # Bold "Ours" label
 labels = ax.get_yticklabels()
 labels[ours_idx].set_fontweight("bold")
 labels[ours_idx].set_color(BLUE)
 
-ax.set_xlabel("Accuracy", fontsize=11, labelpad=8)
+ax.set_xlabel("Accuracy", fontsize=14, labelpad=10)
 ax.set_xlim(bar_xmin, 78)
 ax.set_xticks([40, 50, 60, 70])
-ax.set_title("XBench-DeepSearch", fontsize=14, fontweight="bold", pad=14)
+ax.set_title("XBench-DeepSearch", fontsize=18, fontweight="bold", pad=16)
 ax.invert_yaxis()
 
 fig.tight_layout()
-fig.savefig("figures/xbench_deepsearch.png", dpi=200, bbox_inches="tight")
+fig.savefig("figures/xbench_deepsearch.png", dpi=300, bbox_inches="tight")
 plt.close(fig)
 print("figures/xbench_deepsearch.png")
