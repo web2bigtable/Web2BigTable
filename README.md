@@ -1,10 +1,4 @@
-<p align="center">
-  <img src="figures/logo.svg" width="80" alt="Memento-Teams logo">
-</p>
-
-<h1 align="center">Memento-Teams</h1>
-
-<h3 align="center"><b>Multi-Agent Orchestration with Self-Evolving Decomposition</b></h3>
+<h1 align="center"><img src="figures/logo.svg" width="42" style="vertical-align: middle;" alt="logo">&nbsp;Memento-Team: A Bilevel Game Framework for Self-Evolving Multi-Agent Systems</h1>
 
 <p align="center">Decompose complex tasks. Dispatch parallel workers. Evolve better strategies from every run.</p>
 
@@ -48,33 +42,24 @@ We evaluate Memento-Teams on two challenging benchmarks:
 - [**WideSearch**](https://widesearch.github.io/) — a benchmark for complex, multi-step information retrieval tasks requiring parallel search, data extraction, and structured output across diverse domains.
 - [**XBench-DeepSearch**](https://arxiv.org/abs/2505.03829) — a benchmark for evaluating deep research capabilities on real-world questions requiring multi-hop reasoning and comprehensive web search.
 
-### WideSearch-EN (Avg@4)
-
-| Model | Row F1 | Item F1 | Success Rate |
-| --- | ---: | ---: | ---: |
-| Doubao-1.6 | 34.0 | 54.6 | 2.5 |
-| Gemini 2.5 Pro | 36.6 | 59.1 | 4.3 |
-| o3-high | 37.8 | 57.3 | 5.1 |
-| Claude Sonnet 4 | 38.5 | 62.2 | 3.6 |
-| **Memento-Teams (Ours)** | **63.5** | **80.1** | **38.5** |
-
 <table>
-<tr>
-<td width="50%">
+<tr><td>
 <p align="center">
   <img src="figures/widesearch_en.png" width="100%" alt="WideSearch-EN bubble chart">
 </p>
 <p align="center"><b>WideSearch-EN</b></p>
-<p align="center"><sub>Performance landscape on WideSearch-EN (Avg@4). Position encodes Row F1 (x) and Item F1 (y); label encodes Success Rate. Dashed lines show frontier single-agent Item F1.</sub></p>
-</td>
-<td width="50%">
+<p align="center"><sub>Performance landscape on WideSearch-EN (Avg@4). Position encodes Row F1 (x) and Item F1 (y); label encodes Success Rate. Dashed lines show frontier single-agent Item F1. Memento-Team dominates all three metrics simultaneously.</sub></p>
+</td></tr>
+</table>
+
+<table>
+<tr><td>
 <p align="center">
   <img src="figures/xbench_deepsearch.png" width="100%" alt="XBench-DeepSearch bar chart">
 </p>
 <p align="center"><b>XBench-DeepSearch</b></p>
-<p align="center"><sub>Accuracy on XBench-DeepSearch. Memento-Teams (68.0%) surpasses all open-source agentic models and rivals frontier proprietary systems.</sub></p>
-</td>
-</tr>
+<p align="center"><sub>Accuracy on XBench-DeepSearch. Memento-Team (68.0%) surpasses all open-source agentic models and rivals frontier proprietary systems.</sub></p>
+</td></tr>
 </table>
 
 ---
