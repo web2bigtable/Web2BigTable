@@ -1,4 +1,4 @@
-<h1 align="center">Bilevel Coordinated Reflection:<br>A Game-Theoretic Approach to Multi-Agent LLM Systems</h1>
+<h1 align="center">Web2BigTable: A Bi-Level Multi-Agent Framework for<br>Web-to-Table Search</h1>
 
 <p align="center">Decompose complex tasks. Dispatch parallel workers. Evolve better strategies from every run.</p>
 
