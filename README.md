@@ -3,15 +3,15 @@
 <p align="center">Decompose complex tasks. Dispatch parallel workers. Evolve better strategies from every run.</p>
 
 <p align="center">
-  <a href="#what-is-memento-teams"><b>English</b></a> ·
+  <a href="#what-is-Web2BigTable"><b>English</b></a> ·
   <a href="#chinese-summary"><b>中文摘要</b></a>
 </p>
 
 ---
 
-## What Is Memento-Teams?
+## What Is Web2BigTable?
 
-Memento-Teams is a **multi-agent orchestration system** that decomposes complex tasks into parallel subtasks and executes them using skill-based worker agents. The orchestrator is built on LangChain and communicates with a pool of Memento-S workers via MCP (Model Context Protocol).
+Web2BigTable is a **multi-agent orchestration system** that decomposes complex tasks into parallel subtasks and executes them using skill-based worker agents. The orchestrator is built on LangChain and communicates with a pool of Memento-S workers via MCP (Model Context Protocol).
 
 What makes it interesting is not just parallel execution. It is the **evolved decomposition strategies**. The system ships with 11 specialised decompose-* skills and a task-router, all evolved from task experience. When a new task arrives, the router selects the best decomposition pattern — so different types of tasks are broken down in different ways.
 
@@ -37,7 +37,7 @@ What makes it interesting is not just parallel execution. It is the **evolved de
 
 ## Benchmark Results
 
-We evaluate Memento-Teams on two challenging benchmarks:
+We evaluate Web2BigTable on two challenging benchmarks:
 
 - [**WideSearch**](https://widesearch.github.io/) — a benchmark for complex, multi-step information retrieval tasks requiring parallel search, data extraction, and structured output across diverse domains.
 - [**XBench-DeepSearch**](https://arxiv.org/abs/2505.03829) — a benchmark for evaluating deep research capabilities on real-world questions requiring multi-hop reasoning and comprehensive web search.
@@ -48,7 +48,7 @@ We evaluate Memento-Teams on two challenging benchmarks:
   <img src="figures/widesearch_en.png" width="100%" alt="WideSearch-EN bubble chart">
 </p>
 <p align="center"><b>WideSearch-EN</b></p>
-<p align="center"><sub>Performance landscape on WideSearch-EN (Avg@4). Position encodes Row F1 (x) and Item F1 (y); label encodes Success Rate. Dashed lines show frontier single-agent Item F1. Memento-Team dominates all three metrics simultaneously.</sub></p>
+<p align="center"><sub>Performance landscape on WideSearch (Avg@4). Position encodes Row F1 (x) and Item F1 (y); label encodes Success Rate. Dashed lines show frontier single-agent Item F1. Memento-Team dominates all three metrics simultaneously.</sub></p>
 </td></tr>
 </table>
 
