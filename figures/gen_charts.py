@@ -77,9 +77,9 @@ ax.set_xticks([30, 40, 50, 60, 70])
 ax.set_yticks([50, 55, 60, 65, 70, 75, 80, 85])
 
 fig.tight_layout()
-fig.savefig("figures/widesearch_en.png", dpi=300, bbox_inches="tight")
+fig.savefig("figures/widesearch.png", dpi=300, bbox_inches="tight")
 plt.close(fig)
-print("figures/widesearch_en.png")
+print("figures/widesearch.png")
 
 
 # ══════════════════════════════════════════════════════════════

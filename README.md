@@ -45,10 +45,10 @@ We evaluate Web2BigTable on two challenging benchmarks:
 <table>
 <tr><td>
 <p align="center">
-  <img src="figures/widesearch_en.png" width="100%" alt="WideSearch-EN bubble chart">
+  <img src="figures/widesearch.png" width="100%" alt="WideSearch bubble chart">
 </p>
-<p align="center"><b>WideSearch-EN</b></p>
-<p align="center"><sub>Performance landscape on WideSearch (Avg@4). Position encodes Row F1 (x) and Item F1 (y); label encodes Success Rate. Dashed lines show frontier single-agent Item F1. Memento-Team dominates all three metrics simultaneously.</sub></p>
+<p align="center"><b>WideSearch</b></p>
+<p align="center"><sub>Performance landscape on WideSearch (Avg@4). Position encodes Row F1 (x) and Item F1 (y); label encodes Success Rate. Dashed lines show frontier single-agent Item F1. Web2BigTable dominates all three metrics simultaneously.</sub></p>
 </td></tr>
 </table>
 
@@ -58,7 +58,7 @@ We evaluate Web2BigTable on two challenging benchmarks:
   <img src="figures/xbench_deepsearch.png" width="100%" alt="XBench-DeepSearch bar chart">
 </p>
 <p align="center"><b>XBench-DeepSearch</b></p>
-<p align="center"><sub>Accuracy on XBench-DeepSearch. Memento-Team (68.0%) surpasses all open-source agentic models and rivals frontier proprietary systems.</sub></p>
+<p align="center"><sub>Accuracy on XBench-DeepSearch. Web2BigTable (68.0%) surpasses all open-source agentic models and rivals frontier proprietary systems.</sub></p>
 </td></tr>
 </table>
 
@@ -67,10 +67,10 @@ We evaluate Web2BigTable on two challenging benchmarks:
 <table>
 <tr><td>
 <p align="center">
-  <img src="figures/team.png" width="100%" alt="Memento-Teams architecture">
+  <img src="figures/team.png" width="100%" alt="Web2BigTable architecture">
 </p>
 <p align="center"><b>System Architecture</b></p>
-<p align="center"><sub>The architecture of Memento-Teams. A user submits a task through the TUI. The <b>Orchestrator Agent</b> loads evolved decomposition strategies (orchestrator skills) and uses an LLM to break the task into self-contained subtasks with a shared workboard. Subtasks are dispatched in parallel to <b>Memento-S worker agents</b> via an MCP server. Each worker independently routes to the best skill, executes multi-round operations, and coordinates with other workers through the shared workboard. Results are aggregated and synthesised into a final response.</sub></p>
+<p align="center"><sub>The architecture of Web2BigTable. A user submits a task through the TUI. The <b>Orchestrator Agent</b> loads evolved decomposition strategies (orchestrator skills) and uses an LLM to break the task into self-contained subtasks with a shared workboard. Subtasks are dispatched in parallel to <b>Memento-S worker agents</b> via an MCP server. Each worker independently routes to the best skill, executes multi-round operations, and coordinates with other workers through the shared workboard. Results are aggregated and synthesised into a final response.</sub></p>
 </td></tr>
 </table>
 
@@ -98,7 +98,7 @@ We evaluate Web2BigTable on two challenging benchmarks:
 
 ## Key Features
 
-> **Core question.** Memento-Teams is not about building yet another chatbot wrapper.
+> **Core question.** Web2BigTable is not about building yet another chatbot wrapper.
 > It is about **how to decompose hard tasks into parallel subtasks, coordinate workers effectively, and evolve better decomposition strategies from every run**.
 
 <table>
@@ -129,7 +129,7 @@ Decomposition strategies are evolved from past task executions — the system cl
 
 ## What Makes It Different?
 
-Memento-Teams is built around a `Route → Decompose → Execute → Synthesise` loop.
+Web2BigTable is built around a `Route → Decompose → Execute → Synthesise` loop.
 
 | Phase | What it means |
 | --- | --- |
@@ -138,22 +138,22 @@ Memento-Teams is built around a `Route → Decompose → Execute → Synthesise`
 | **Execute** | Subtasks are dispatched in parallel to up to 10 Memento-S workers via MCP. Each worker independently routes to the best skill, executes multi-round operations, and coordinates with other workers through the shared workboard (claim sections, post partial results, avoid duplicate work). |
 | **Synthesise** | The orchestrator aggregates worker results, resolves conflicts, and produces a final structured response. |
 
-This is the key difference from systems that simply fan out subtasks to workers. Memento-Teams uses **evolved orchestrator skills** to decide *how* to decompose each task, rather than relying on a single generic prompt.
+This is the key difference from systems that simply fan out subtasks to workers. Web2BigTable uses **evolved orchestrator skills** to decide *how* to decompose each task, rather than relying on a single generic prompt.
 
 ---
 
 ## One-Click Install
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/Memento-Teams/Memento-Teams/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/Web2BigTable/Web2BigTable/main/install.sh | bash
 ```
 
 <table>
 <tr><td>
 <p align="center">
-  <img src="figures/terminal-demo.gif" width="100%" alt="Memento-Teams install and launch demo">
+  <img src="figures/terminal-demo.gif" width="100%" alt="Web2BigTable install and launch demo">
 </p>
-<p align="center"><sub>One command to install, one command to launch. The installer sets up dependencies, downloads router assets, configures API keys, and creates the <code>memento-teams</code> command.</sub></p>
+<p align="center"><sub>One command to install, one command to launch. The installer sets up dependencies, downloads router assets, configures API keys, and creates the <code>web2bigtable</code> command.</sub></p>
 </td></tr>
 </table>
 
@@ -163,13 +163,13 @@ The installer will:
 - Install all dependencies (Memento-S + orchestrator)
 - Download router assets (skill catalog + optional embeddings)
 - Configure `.env` interactively (API keys)
-- Create the `memento-teams` command
+- Create the `web2bigtable` command
 
 ## Quick Start (Developer)
 
 ```bash
-git clone https://github.com/Memento-Teams/Memento-Teams.git
-cd Memento-Teams
+git clone https://github.com/Web2BigTable/Web2BigTable.git
+cd Web2BigTable
 
 # Install Memento-S worker dependencies
 cd Memento-S && uv sync --python 3.12 && cd ..
@@ -190,7 +190,7 @@ SERPER_API_KEY=...
 Then launch:
 
 ```bash
-memento-teams
+web2bigtable
 ```
 
 <details>
@@ -228,7 +228,7 @@ Workers automatically select the best skill for each subtask via semantic routin
 ## TUI
 
 ```bash
-memento-teams
+web2bigtable
 ```
 
 - Submit tasks directly from the interface (`Ctrl+Enter` or **Run Task**)
@@ -249,9 +249,9 @@ memento-teams
 <table>
 <tr><td>
 <p align="center">
-  <img src="figures/demo.gif" width="100%" alt="Memento-Team demo">
+  <img src="figures/demo.gif" width="100%" alt="Web2BigTable demo">
 </p>
-<p align="center"><sub>Memento-Team in action — from task submission to multi-worker parallel execution and final result synthesis.</sub></p>
+<p align="center"><sub>Web2BigTable in action — from task submission to multi-worker parallel execution and final result synthesis.</sub></p>
 </td></tr>
 </table>
 
@@ -261,7 +261,7 @@ memento-teams
 <summary><b>Project structure</b></summary>
 
 ```text
-Memento-Teams/
+Web2BigTable/
 ├── tui_app.py                          # Textual TUI — primary interface
 ├── main.py                             # Standalone entry point (non-TUI)
 ├── install.sh                          # One-click installer
@@ -331,22 +331,22 @@ Memento-Teams/
 
 ## Memento Ecosystem
 
-Memento-Teams is part of the broader **Memento** project family.
+Web2BigTable is part of the broader **Memento** project family.
 
 | Resource | Link | Description |
 | --- | --- | --- |
 | **Memento Homepage** | [memento.run](https://memento.run/) | The hub for all Memento series projects and research |
-| **Memento-Skills** | [GitHub](https://github.com/Memento-Teams/Memento-Skills) | Single-agent self-evolving skill framework |
-| **Memento-Teams** | [GitHub](https://github.com/Memento-Teams/Memento-Teams) | Multi-agent orchestration with self-improving decomposition (this repo) |
+| **Memento-Skills** | [GitHub](https://github.com/Web2BigTable/Memento-Skills) | Single-agent self-evolving skill framework |
+| **Web2BigTable** | [GitHub](https://github.com/Web2BigTable/Web2BigTable) | Multi-agent orchestration with self-improving decomposition (this repo) |
 | **Discord Community** | [Join Discord](https://discord.com/invite/ztFS5YmB) | Discussion, Q&A, feature requests, and collaboration |
 
 ## Citation
 
-If you find Memento-Teams useful in your research, please cite:
+If you find Web2BigTable useful in your research, please cite:
 
 ```bibtex
-@article{memento-teams2026,
-  title={Memento-Teams: Multi-Agent Orchestration with Self-Improving Decomposition},
+@article{web2bigtable2026,
+  title={Web2BigTable: Multi-Agent Orchestration with Self-Improving Decomposition},
   author={},
   journal={arXiv preprint},
   year={2026}
@@ -360,11 +360,11 @@ If you find Memento-Teams useful in your research, please cite:
 <details>
 <summary><b>点击展开中文摘要</b></summary>
 
-Memento-Teams 是一个多智能体协作系统，核心思路是将复杂任务分解为可并行执行的子任务，由多个 Memento-S 工作智能体同时处理，并通过共享工作板（workboard）进行协调。
+Web2BigTable 是一个多智能体协作系统，核心思路是将复杂任务分解为可并行执行的子任务，由多个 Memento-S 工作智能体同时处理，并通过共享工作板（workboard）进行协调。
 
 系统围绕 `路由 → 分解 → 执行 → 合成` 的在线流程构建。编排智能体（Orchestrator）通过 task-router 识别任务类型，匹配最佳的 decompose-* 分解策略，将任务拆分为独立子任务；工作智能体通过语义路由选择最佳技能并行执行，通过共享 workboard 进行协调；最后编排智能体聚合结果，生成最终响应。
 
-在 WideSearch-EN 基准测试中，Memento-Teams 在 Row F1（63.5）、Item F1（80.1）和 Success Rate（38.5）三项指标上全面超越 o3-high、Gemini 2.5 Pro、Claude Sonnet 4 等前沿基线。在 XBench-DeepSearch 上达到 68.0% 准确率，超越所有开源智能体模型，接近前沿商业系统。
+在 WideSearch 基准测试中，Web2BigTable 在 Row F1（63.5）、Item F1（80.1）和 Success Rate（38.5）三项指标上全面超越 o3-high、Gemini 2.5 Pro、Claude Sonnet 4 等前沿基线。在 XBench-DeepSearch 上达到 68.0% 准确率，超越所有开源智能体模型，接近前沿商业系统。
 
 </details>
 

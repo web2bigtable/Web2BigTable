@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# Memento-Teams One-Click Installer (uv version)
-# Usage: curl -sSL https://raw.githubusercontent.com/Memento-Teams/Memento-Teams/main/install.sh | bash
+# Web2BigTable One-Click Installer (uv version)
+# Usage: curl -sSL https://raw.githubusercontent.com/Web2BigTable/Web2BigTable/main/install.sh | bash
 #        or: ./install.sh
 #
 
@@ -16,9 +16,9 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 # Config
-REPO_URL="https://github.com/Memento-Teams/Memento-Teams.git"
+REPO_URL="https://github.com/Web2BigTable/Web2BigTable.git"
 REPO_BRANCH="main"
-INSTALL_DIR="${MEMENTO_TEAMS_INSTALL_DIR:-$HOME/memento-teams}"
+INSTALL_DIR="${WEB2BIGTABLE_INSTALL_DIR:-$HOME/web2bigtable}"
 DEFAULT_OPENROUTER_BASE_URL="https://openrouter.ai/api/v1"
 DEFAULT_OPENROUTER_MODEL="deepseek/deepseek-v3.2"
 ROUTER_DATASET_REPO="AgentFly/router-data"
@@ -27,14 +27,9 @@ print_banner() {
     echo -e "${CYAN}"
     echo "╔═══════════════════════════════════════════════════════════════════════╗"
     echo "║                                                                       ║"
-    echo "║   ███╗   ███╗███████╗███╗   ███╗███████╗███╗   ██╗████████╗ ██████╗    ║"
-    echo "║   ████╗ ████║██╔════╝████╗ ████║██╔════╝████╗  ██║╚══██╔══╝██╔═══██╗   ║"
-    echo "║   ██╔████╔██║█████╗  ██╔████╔██║█████╗  ██╔██╗ ██║   ██║   ██║   ██║   ║"
-    echo "║   ██║╚██╔╝██║██╔══╝  ██║╚██╔╝██║██╔══╝  ██║╚██╗██║   ██║   ██║   ██║   ║"
-    echo "║   ██║ ╚═╝ ██║███████╗██║ ╚═╝ ██║███████╗██║ ╚████║   ██║   ╚██████╔╝   ║"
-    echo "║   ╚═╝     ╚═╝╚══════╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝    ╚═════╝    ║"
-    echo "║                        Memento-Teams                                 ║"
-    echo "║               Multi-Agent Orchestrator Installer                     ║"
+    echo "║                            Web2BigTable                               ║"
+    echo "║              Bi-Level Multi-Agent Web-to-Table Search                 ║"
+    echo "║                          Installer (uv)                               ║"
     echo "║                                                                       ║"
     echo "╚═══════════════════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
@@ -394,7 +389,7 @@ add_to_path() {
 
     if [ -f "$shell_rc" ] && ! grep -q "$dir" "$shell_rc" 2>/dev/null; then
         echo "" >> "$shell_rc"
-        echo "# Added by Memento-Teams installer" >> "$shell_rc"
+        echo "# Added by Web2BigTable installer" >> "$shell_rc"
         echo "export PATH=\"$dir:\$PATH\"" >> "$shell_rc"
         log_success "Added to $shell_rc"
     fi
@@ -407,7 +402,7 @@ add_to_path() {
 create_launcher() {
     log_info "Creating launcher script..."
 
-    LAUNCHER="$INSTALL_DIR/memento-teams"
+    LAUNCHER="$INSTALL_DIR/web2bigtable"
     cat > "$LAUNCHER" << 'EOF'
 #!/usr/bin/env bash
 SOURCE="${BASH_SOURCE[0]}"
@@ -421,30 +416,30 @@ SCRIPT_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
 cd "$SCRIPT_DIR"
 
 # Use uv run — it handles the venv automatically
-uv run python -c "from tui_app import MementoTeams; MementoTeams().run()"
+uv run python -c "from tui_app import Web2BigTable; Web2BigTable().run()"
 EOF
     chmod +x "$LAUNCHER"
 
     # Create command link with robust fallback
     local installed_link=""
     if [ -w "/usr/local/bin" ]; then
-        if ln -sf "$LAUNCHER" /usr/local/bin/memento-teams 2>/dev/null; then
-            installed_link="/usr/local/bin/memento-teams"
+        if ln -sf "$LAUNCHER" /usr/local/bin/web2bigtable 2>/dev/null; then
+            installed_link="/usr/local/bin/web2bigtable"
             log_success "Symlink: $installed_link"
         fi
     elif [ -d "/usr/local/bin" ]; then
-        if sudo ln -sf "$LAUNCHER" /usr/local/bin/memento-teams 2>/dev/null; then
-            installed_link="/usr/local/bin/memento-teams"
+        if sudo ln -sf "$LAUNCHER" /usr/local/bin/web2bigtable 2>/dev/null; then
+            installed_link="/usr/local/bin/web2bigtable"
             log_success "Symlink: $installed_link (sudo)"
         else
-            log_warn "Could not write /usr/local/bin/memento-teams, falling back to ~/.local/bin"
+            log_warn "Could not write /usr/local/bin/web2bigtable, falling back to ~/.local/bin"
         fi
     fi
 
     if [ -z "$installed_link" ]; then
         mkdir -p "$HOME/.local/bin"
-        ln -sf "$LAUNCHER" "$HOME/.local/bin/memento-teams"
-        installed_link="$HOME/.local/bin/memento-teams"
+        ln -sf "$LAUNCHER" "$HOME/.local/bin/web2bigtable"
+        installed_link="$HOME/.local/bin/web2bigtable"
         add_to_path "$HOME/.local/bin"
         log_success "Symlink: $installed_link"
     fi
@@ -453,11 +448,11 @@ EOF
     hash -r 2>/dev/null || true
 
     local resolved_cmd=""
-    resolved_cmd="$(command -v memento-teams 2>/dev/null || true)"
+    resolved_cmd="$(command -v web2bigtable 2>/dev/null || true)"
     if [ -n "$resolved_cmd" ]; then
-        log_success "Command available: memento-teams -> $resolved_cmd"
+        log_success "Command available: web2bigtable -> $resolved_cmd"
     else
-        log_warn "Command not yet in PATH for this shell. Reopen terminal, then run: memento-teams"
+        log_warn "Command not yet in PATH for this shell. Reopen terminal, then run: web2bigtable"
     fi
 
     log_success "Launcher created: $LAUNCHER"
@@ -471,14 +466,14 @@ print_success() {
     echo ""
     echo -e "  ${CYAN}Install directory:${NC} $INSTALL_DIR"
     echo ""
-    echo -e "  ${YELLOW}To start Memento-Teams:${NC}"
+    echo -e "  ${YELLOW}To start Web2BigTable:${NC}"
     echo ""
-    echo -e "    ${GREEN}memento-teams${NC}            # Launch TUI"
+    echo -e "    ${GREEN}web2bigtable${NC}            # Launch TUI"
     echo ""
     echo -e "  ${CYAN}Or run directly:${NC}"
-    echo -e "    ${GREEN}cd $INSTALL_DIR && uv run python -c \"from tui_app import MementoTeams; MementoTeams().run()\"${NC}"
+    echo -e "    ${GREEN}cd $INSTALL_DIR && uv run python -c \"from tui_app import Web2BigTable; Web2BigTable().run()\"${NC}"
     echo ""
-    echo -e "  ${YELLOW}Note:${NC} If 'memento-teams' not found, restart terminal or run:"
+    echo -e "  ${YELLOW}Note:${NC} If 'web2bigtable' not found, restart terminal or run:"
     echo -e "        ${CYAN}source ~/.zshrc${NC} (or ~/.bashrc)"
     echo ""
 }

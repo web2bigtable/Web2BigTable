@@ -63,8 +63,8 @@ def cleanup_board() -> None:
         pass
 
 
-class MementoTeams(App):
-    TITLE = "Memento-Teams"
+class Web2BigTable(App):
+    TITLE = "Web2BigTable"
     """Minimal Textual UI for running tasks and inspecting worker logs."""
 
     CSS = """
@@ -1737,7 +1737,7 @@ class MementoTeams(App):
 
 
 def main() -> None:
-    MementoTeams().run()
+    Web2BigTable().run()
 
 
 if __name__ == "__main__":
