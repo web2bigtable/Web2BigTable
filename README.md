@@ -244,17 +244,6 @@ web2bigtable
 | `c` | Copy final output to clipboard |
 | `q` | Quit |
 
-## Demo
-
-<table>
-<tr><td>
-<p align="center">
-  <img src="figures/demo.gif" width="100%" alt="Web2BigTable demo">
-</p>
-<p align="center"><sub>Web2BigTable in action — from task submission to multi-worker parallel execution and final result synthesis.</sub></p>
-</td></tr>
-</table>
-
 ## Developer Notes
 
 <details>
