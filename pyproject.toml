@@ -1,7 +1,7 @@
 [project]
-name = "memento-teams"
+name = "web2bigtable"
 version = "0.1.0"
-description = "Memento-Teams: Multi-agent orchestrator with TUI"
+description = "Web2BigTable: Bi-level multi-agent framework for web-to-table search"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "textual",

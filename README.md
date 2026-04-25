@@ -3,7 +3,7 @@
 <p align="center">Decompose complex tasks. Dispatch parallel workers. Evolve better strategies from every run.</p>
 
 <p align="center">
-  <a href="#what-is-Web2BigTable"><b>English</b></a> ·
+  <a href="#what-is-web2bigtable"><b>English</b></a> ·
   <a href="#chinese-summary"><b>中文摘要</b></a>
 </p>
 
@@ -11,9 +11,9 @@
 
 ## What Is Web2BigTable?
 
-Web2BigTable is a **multi-agent orchestration system** that decomposes complex tasks into parallel subtasks and executes them using skill-based worker agents. The orchestrator is built on LangChain and communicates with a pool of Memento-S workers via MCP (Model Context Protocol).
+Web2BigTable is a **bi-level multi-agent framework for web-to-table search** — given a natural-language query and a target schema, it autonomously searches the open web and returns a structured table whose rows are entities, whose columns are the requested attributes, and whose cells are independently verified against web sources. It handles both **wide search** (broad-coverage tasks that assemble many consistent rows across heterogeneous sources) and **deep search** (single complex queries resolved by chaining indirect clues across many hops).
 
-What makes it interesting is not just parallel execution. It is the **evolved decomposition strategies**. The system ships with 11 specialised decompose-* skills and a task-router, all evolved from task experience. When a new task arrives, the router selects the best decomposition pattern — so different types of tasks are broken down in different ways.
+An **upper-level orchestrator** decomposes the task and dispatches sub-problems to **lower-level worker agents** that solve them in parallel and coordinate through a shared workspace to reduce redundant exploration and reconcile conflicting evidence. The system is **self-evolving** through a closed-loop run-verify-reflect process that jointly refines *how tasks are decomposed* and *how sub-tasks are solved* — adaptation is mediated through persistent, human-readable external memory, leaving the underlying LLMs frozen throughout.
 
 <p align="center">
   <img src="https://img.shields.io/badge/Version-0.1.0-blue?style=for-the-badge" alt="Version 0.1.0">
@@ -58,7 +58,7 @@ We evaluate Web2BigTable on two challenging benchmarks:
   <img src="figures/xbench_deepsearch.png" width="100%" alt="XBench-DeepSearch bar chart">
 </p>
 <p align="center"><b>XBench-DeepSearch</b></p>
-<p align="center"><sub>Accuracy on XBench-DeepSearch. Web2BigTable (68.0%) surpasses all open-source agentic models and rivals frontier proprietary systems.</sub></p>
+<p align="center"><sub>Accuracy on XBench-DeepSearch. Web2BigTable (73.0%) surpasses all open-source agentic models and rivals frontier proprietary systems.</sub></p>
 </td></tr>
 </table>
 
@@ -70,7 +70,7 @@ We evaluate Web2BigTable on two challenging benchmarks:
   <img src="figures/team.png" width="100%" alt="Web2BigTable architecture">
 </p>
 <p align="center"><b>System Architecture</b></p>
-<p align="center"><sub>The architecture of Web2BigTable. A user submits a task through the TUI. The <b>Orchestrator Agent</b> loads evolved decomposition strategies (orchestrator skills) and uses an LLM to break the task into self-contained subtasks with a shared workboard. Subtasks are dispatched in parallel to <b>Memento-S worker agents</b> via an MCP server. Each worker independently routes to the best skill, executes multi-round operations, and coordinates with other workers through the shared workboard. Results are aggregated and synthesised into a final response.</sub></p>
+<p align="center"><sub>Three-stage architecture of Web2BigTable. <b>Stage 1 (Orchestrate):</b> an Orchestrator LLM reads decomposition strategies from Strategy Memory <i>S<sub>o</sub></i> through a Skill Router and partitions the user query into <i>N</i> subtasks (each with instruction and output schema). <b>Stage 2 (Execute):</b> parallel worker agents resolve execution skills from a Shared Skill Bank <i>S<sub>w</sub></i> (dynamic retrieval + self-repair) and coordinate asynchronously through a Shared Workboard <i>m<sub>e</sub></i> — file-locked, tag-partitioned — to avoid duplicated work and fill coverage gaps; partial outputs are aggregated into the structured BigTable. <b>Stage 3 (Evolve, training only — red arrows):</b> a Run-Verify-Reflect loop contrasts system output against a gold reference, clusters error patterns, and refines/modularises both decomposition skills (written back to <i>S<sub>o</sub></i>) and execution skills (written back to <i>S<sub>w</sub></i>). At inference time (black arrows), Stages 1–2 run with frozen <i>S<sub>o</sub></i> and <i>S<sub>w</sub></i> and no reflection.</sub></p>
 </td></tr>
 </table>
 
@@ -129,16 +129,15 @@ Decomposition strategies are evolved from past task executions — the system cl
 
 ## What Makes It Different?
 
-Web2BigTable is built around a `Route → Decompose → Execute → Synthesise` loop.
+Web2BigTable is organised as a three-stage `Orchestrate → Execute → Evolve` pipeline. The first two stages run on every query; the third runs only during training and writes its lessons back into persistent external memory.
 
-| Phase | What it means |
+| Stage | What it means |
 | --- | --- |
-| **Route** | The orchestrator loads evolved decomposition strategies (orchestrator skills). A task-router identifies which decomposition pattern best fits the incoming task — split by entity, time period, category, rank segment, or other evolved patterns. |
-| **Decompose** | The matched decompose-* skill guides the LLM to break the task into self-contained subtasks, each with clear instructions, and creates a shared workboard for inter-worker coordination. |
-| **Execute** | Subtasks are dispatched in parallel to up to 10 Memento-S workers via MCP. Each worker independently routes to the best skill, executes multi-round operations, and coordinates with other workers through the shared workboard (claim sections, post partial results, avoid duplicate work). |
-| **Synthesise** | The orchestrator aggregates worker results, resolves conflicts, and produces a final structured response. |
+| **Orchestrate** | An Orchestrator LLM reads decomposition strategies from Strategy Memory <i>S<sub>o</sub></i> via a Skill Router, picks the best-matching pattern for the incoming query, and partitions it into <i>N</i> self-contained subtasks (instruction + output schema). |
+| **Execute** | Parallel worker agents resolve execution skills from a Shared Skill Bank <i>S<sub>w</sub></i> with dynamic retrieval and self-repair, and coordinate asynchronously through a file-locked, tag-partitioned Shared Workboard <i>m<sub>e</sub></i> — claiming sections, posting partial findings, and reconciling conflicts as the global state evolves. Outputs are aggregated into a structured BigTable. |
+| **Evolve** *(training only)* | A Run-Verify-Reflect loop contrasts system output against a gold reference, clusters error patterns, and refines/modularises *both* decomposition skills (written back to <i>S<sub>o</sub></i>) and execution skills (written back to <i>S<sub>w</sub></i>). At inference time the two memories are frozen and read-only. |
 
-This is the key difference from systems that simply fan out subtasks to workers. Web2BigTable uses **evolved orchestrator skills** to decide *how* to decompose each task, rather than relying on a single generic prompt.
+The key difference from prior multi-agent systems is **bi-level co-evolution**: most frameworks adapt either *how to plan* (decomposition) or *how to act* (execution skills), but not both. Web2BigTable jointly refines them through the same closed-loop reflection, mediated entirely by persistent, human-readable external memory — the underlying LLMs are never fine-tuned.
 
 ---
 
@@ -353,7 +352,7 @@ Web2BigTable 是一个多智能体协作系统，核心思路是将复杂任务�
 
 系统围绕 `路由 → 分解 → 执行 → 合成` 的在线流程构建。编排智能体（Orchestrator）通过 task-router 识别任务类型，匹配最佳的 decompose-* 分解策略，将任务拆分为独立子任务；工作智能体通过语义路由选择最佳技能并行执行，通过共享 workboard 进行协调；最后编排智能体聚合结果，生成最终响应。
 
-在 WideSearch 基准测试中，Web2BigTable 在 Row F1（63.5）、Item F1（80.1）和 Success Rate（38.5）三项指标上全面超越 o3-high、Gemini 2.5 Pro、Claude Sonnet 4 等前沿基线。在 XBench-DeepSearch 上达到 68.0% 准确率，超越所有开源智能体模型，接近前沿商业系统。
+在 WideSearch 基准测试中，Web2BigTable 在 Row F1（63.5）、Item F1（80.1）和 Success Rate（38.5）三项指标上全面超越 o3-high、Gemini 2.5 Pro、Claude Sonnet 4 等前沿基线。在 XBench-DeepSearch 上达到 73.0% 准确率，超越所有开源智能体模型，接近前沿商业系统。
 
 </details>
 

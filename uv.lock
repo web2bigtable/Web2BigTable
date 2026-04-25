@@ -1494,75 +1494,6 @@ wheels = [
 ]
 
 [[package]]
-name = "memento-teams"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "aiofiles" },
-    { name = "aiohttp" },
-    { name = "anthropic" },
-    { name = "anyio" },
-    { name = "chromadb" },
-    { name = "crawl4ai" },
-    { name = "fastmcp" },
-    { name = "google-search-results" },
-    { name = "httpx" },
-    { name = "jieba" },
-    { name = "langchain" },
-    { name = "langchain-core" },
-    { name = "langchain-mcp-adapters" },
-    { name = "langchain-openai" },
-    { name = "langgraph" },
-    { name = "litellm" },
-    { name = "nltk" },
-    { name = "openai" },
-    { name = "pydantic" },
-    { name = "pydantic-settings" },
-    { name = "python-dotenv" },
-    { name = "pyyaml" },
-    { name = "rank-bm25" },
-    { name = "requests" },
-    { name = "rich" },
-    { name = "sentence-transformers" },
-    { name = "textual" },
-    { name = "tiktoken" },
-    { name = "watchdog" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "aiofiles" },
-    { name = "aiohttp" },
-    { name = "anthropic" },
-    { name = "anyio" },
-    { name = "chromadb" },
-    { name = "crawl4ai" },
-    { name = "fastmcp" },
-    { name = "google-search-results" },
-    { name = "httpx" },
-    { name = "jieba", specifier = ">=0.42.1" },
-    { name = "langchain" },
-    { name = "langchain-core" },
-    { name = "langchain-mcp-adapters" },
-    { name = "langchain-openai" },
-    { name = "langgraph" },
-    { name = "litellm" },
-    { name = "nltk" },
-    { name = "openai" },
-    { name = "pydantic" },
-    { name = "pydantic-settings" },
-    { name = "python-dotenv" },
-    { name = "pyyaml" },
-    { name = "rank-bm25" },
-    { name = "requests" },
-    { name = "rich" },
-    { name = "sentence-transformers" },
-    { name = "textual" },
-    { name = "tiktoken" },
-    { name = "watchdog" },
-]
-
-[[package]]
 name = "mmh3"
 version = "5.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -3093,6 +3024,75 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/0a/bf/95895e78dd75efe9a7f31733607f384b42eb5feb54bd2eb6ed57cc2e94f4/watchfiles-1.1.1-cp312-cp312-win32.whl", hash = "sha256:859e43a1951717cc8de7f4c77674a6d389b106361585951d9e69572823f311d9", size = 272042, upload-time = "2025-10-14T15:04:59.046Z" },
     { url = "https://files.pythonhosted.org/packages/87/0a/90eb755f568de2688cb220171c4191df932232c20946966c27a59c400850/watchfiles-1.1.1-cp312-cp312-win_amd64.whl", hash = "sha256:91d4c9a823a8c987cce8fa2690923b069966dabb196dd8d137ea2cede885fde9", size = 288410, upload-time = "2025-10-14T15:05:00.081Z" },
     { url = "https://files.pythonhosted.org/packages/36/76/f322701530586922fbd6723c4f91ace21364924822a8772c549483abed13/watchfiles-1.1.1-cp312-cp312-win_arm64.whl", hash = "sha256:a625815d4a2bdca61953dbba5a39d60164451ef34c88d751f6c368c3ea73d404", size = 278209, upload-time = "2025-10-14T15:05:01.168Z" },
+]
+
+[[package]]
+name = "web2bigtable"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "aiofiles" },
+    { name = "aiohttp" },
+    { name = "anthropic" },
+    { name = "anyio" },
+    { name = "chromadb" },
+    { name = "crawl4ai" },
+    { name = "fastmcp" },
+    { name = "google-search-results" },
+    { name = "httpx" },
+    { name = "jieba" },
+    { name = "langchain" },
+    { name = "langchain-core" },
+    { name = "langchain-mcp-adapters" },
+    { name = "langchain-openai" },
+    { name = "langgraph" },
+    { name = "litellm" },
+    { name = "nltk" },
+    { name = "openai" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "python-dotenv" },
+    { name = "pyyaml" },
+    { name = "rank-bm25" },
+    { name = "requests" },
+    { name = "rich" },
+    { name = "sentence-transformers" },
+    { name = "textual" },
+    { name = "tiktoken" },
+    { name = "watchdog" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "aiofiles" },
+    { name = "aiohttp" },
+    { name = "anthropic" },
+    { name = "anyio" },
+    { name = "chromadb" },
+    { name = "crawl4ai" },
+    { name = "fastmcp" },
+    { name = "google-search-results" },
+    { name = "httpx" },
+    { name = "jieba", specifier = ">=0.42.1" },
+    { name = "langchain" },
+    { name = "langchain-core" },
+    { name = "langchain-mcp-adapters" },
+    { name = "langchain-openai" },
+    { name = "langgraph" },
+    { name = "litellm" },
+    { name = "nltk" },
+    { name = "openai" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "python-dotenv" },
+    { name = "pyyaml" },
+    { name = "rank-bm25" },
+    { name = "requests" },
+    { name = "rich" },
+    { name = "sentence-transformers" },
+    { name = "textual" },
+    { name = "tiktoken" },
+    { name = "watchdog" },
 ]
 
 [[package]]
