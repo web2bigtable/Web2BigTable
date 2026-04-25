@@ -77,10 +77,20 @@ We evaluate Web2BigTable on two challenging benchmarks:
 <table>
 <tr><td>
 <p align="center">
-  <img src="figures/game.png" width="100%" alt="Memento-Teams game-theoretic framework">
+  <img src="figures/train_flow.png" width="100%" alt="Web2BigTable training flow">
 </p>
-<p align="center"><b>Game-Theoretic Framework</b></p>
-<p align="center"><sub>The game-theoretic framework of Memento-Teams. The <b>Upper-Level Leader</b> (Orchestrator) reads decomposition strategies from memory and decomposes tasks into subtasks. The <b>Low-Level Follower</b> dispatches subtasks to parallel workers, each optimising its own objective while reading from and writing to a <b>Shared Memory Buffer</b> (Workboard). Both orchestrator memory and workboard are updated through a memory-write mechanism, enabling coordinated multi-agent execution.</sub></p>
+<p align="center"><b>Training (Self-Evolving) Flow</b></p>
+<p align="center"><sub>Training flow of <b>Web2BigTable</b> over one episode <i>k</i>. For each training query <i>q<sub>k</sub></i>, Stage&nbsp;1 reads the long-term orchestrator skills <i>S<sub>o</sub></i> and decomposes <i>q<sub>k</sub></i> into subtasks <b>τ</b>. Stage&nbsp;2 dispatches the subtasks to <i>N</i> parallel workers, which read execution skills from <i>S<sub>w</sub></i> and read/write the short-term workboard <i>m<sub>e</sub></i> until convergence. Stage&nbsp;3 verifies the aggregated output <i>X<sub>k</sub></i> against the gold reference, produces the structured reflection <i>r<sub>o</sub><sup>k+1</sup></i>, and consolidates it into both <i>S<sub>o</sub></i> (via <i>M<sub>o</sub></i>) and <i>S<sub>w</sub></i> (via <i>M<sub>w</sub></i>). Episodes are processed sequentially: the bottom black loop moves from episode <i>k</i> to <i>k+1</i> without replanning within an episode. After <i>K</i> episodes, the two skill banks (<i>S<sub>o</sub><sup>*</sup></i>, <i>S<sub>w</sub><sup>*</sup></i>) are frozen and returned as the training output, then used unchanged during inference.</sub></p>
+</td></tr>
+</table>
+
+<table>
+<tr><td>
+<p align="center">
+  <img src="figures/inference_flow.png" width="100%" alt="Web2BigTable inference flow">
+</p>
+<p align="center"><b>Inference Flow</b></p>
+<p align="center"><sub>Inference flow of <b>Web2BigTable</b> on an unseen user query <i>q</i>. Using the trained skill banks <i>S<sub>o</sub><sup>*</sup></i> and <i>S<sub>w</sub><sup>*</sup></i> as frozen read-only inputs, Stage&nbsp;1 decomposes <i>q</i> into subtasks <b>τ</b>. Stage&nbsp;2 runs <i>N</i> parallel workers that resolve execution skills from <i>S<sub>w</sub><sup>*</sup></i> and coordinate through the shared workboard <i>m<sub>e</sub></i> (per-query, short-term); their partial outputs {<i>x<sub>i</sub></i>} are aggregated into the structured big table <i>X</i>. No verification, reflection, or memory update is performed: the system runs a single forward pass and returns <i>X</i>.</sub></p>
 </td></tr>
 </table>
 
