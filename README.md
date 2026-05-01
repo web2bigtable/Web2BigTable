@@ -345,8 +345,6 @@ If you find Web2BigTable useful in your research, please cite:
 }
 ```
 
-Paper: [arxiv.org/abs/2604.27221](https://arxiv.org/abs/2604.27221)
-
 ## Chinese Summary
 
 <details>
