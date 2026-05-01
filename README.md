@@ -16,6 +16,7 @@ Web2BigTable is a **bi-level multi-agent framework for web-to-table search** —
 An **upper-level orchestrator** decomposes the task and dispatches sub-problems to **lower-level worker agents** that solve them in parallel and coordinate through a shared workspace to reduce redundant exploration and reconcile conflicting evidence. The system is **self-evolving** through a closed-loop run-verify-reflect process that jointly refines *how tasks are decomposed* and *how sub-tasks are solved* — adaptation is mediated through persistent, human-readable external memory, leaving the underlying LLMs frozen throughout.
 
 <p align="center">
+  <a href="https://arxiv.org/abs/2604.27221"><img src="https://img.shields.io/badge/arXiv-2604.27221-b31b1b?logo=arxiv&logoColor=white" alt="arXiv 2604.27221"></a>
   <img src="https://img.shields.io/badge/Version-0.1.0-blue?style=for-the-badge" alt="Version 0.1.0">
   <img src="https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white" alt="Python 3.12+">
   <img src="https://img.shields.io/badge/Self--Evolving-Decomposition-0284c7" alt="Self-evolving decomposition">
@@ -333,15 +334,18 @@ Web2BigTable is part of the broader **Memento** project family.
 If you find Web2BigTable useful in your research, please cite:
 
 ```bibtex
-@article{web2bigtable2026,
-  title={Web2BigTable: Multi-Agent Orchestration with Self-Improving Decomposition},
-  author={},
-  journal={arXiv preprint},
-  year={2026}
+@misc{huang2026web2bigtablebilevelmultiagentllm,
+      title={Web2BigTable: A Bi-Level Multi-Agent LLM System for Internet-Scale Information Search and Extraction},
+      author={Yuxuan Huang and Yihang Chen and Zhiyuan He and Yuxiang Chen and Ka Yiu Lee and Huichi Zhou and Weilin Luo and Meng Fang and Jun Wang},
+      year={2026},
+      eprint={2604.27221},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2604.27221},
 }
 ```
 
-> Paper coming soon. Citation will be updated with full author list and arXiv ID upon publication.
+Paper: [arxiv.org/abs/2604.27221](https://arxiv.org/abs/2604.27221)
 
 ## Chinese Summary
 
