@@ -1,0 +1,16 @@
+# Local secrets / config
+.env
+.env.local
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Logs & runtime artifacts
+logs/*.jsonl
+Memento-S/workspace/.workboard.md
+Memento-S/workspace/.workboard.lock
+
+# Local manuscript and revision materials
+docs/
